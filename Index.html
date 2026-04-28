@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a3a5c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Pensión · Registro de Cobros</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1a3a5c;
+    --navy-dark: #0f2438;
+    --navy-mid: #234a72;
+    --gold: #c8a84b;
+    --gold-light: #e8c96a;
+    --cream: #f7f3ed;
+    --cream-dark: #ede7dc;
+    --text: #2c2c2c;
+    --text-muted: #7a7a7a;
+    --white: #ffffff;
+    --shadow: 0 4px 24px rgba(26,58,92,0.13);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+  }
+
+  #app {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .app-header {
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 60%, var(--navy-mid) 100%);
+    color: var(--white);
+    padding: 0;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .app-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(200,168,75,0.10);
+    pointer-events: none;
+  }
+  .app-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(200,168,75,0.07);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .back-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--white);
+    font-size: 18px;
+    transition: background 0.18s;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-btn:active { background: rgba(255,255,255,0.22); }
+
+  .header-titles {
+    flex: 1;
+    min-width: 0;
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    opacity: 0.9;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-icon {
+    width: 40px; height: 40px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .header-icon svg { width: 32px; height: 32px; opacity: 0.85; }
+
+  /* ─── SCREEN WRAPPER ─── */
+  .screen {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .screen-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px 16px 32px;
+  }
+
+  /* ─── SCREEN 1: AÑOS ─── */
+  .years-intro {
+    text-align: center;
+    padding: 8px 0 22px;
+  }
+  .years-intro p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .add-year-box {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .add-year-box input[type="number"] {
+    flex: 1;
+    border: 2px solid var(--cream-dark);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    color: var(--text);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.18s;
+    -moz-appearance: textfield;
+  }
+  .add-year-box input[type="number"]::-webkit-inner-spin-button,
+  .add-year-box input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .add-year-box input[type="number"]:focus { border-color: var(--gold); }
+
+  .btn-add-year {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.18s, transform 0.12s;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .btn-add-year:active { opacity: 0.82; transform: scale(0.97); }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+
+  .years-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .year-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    border-left: 4px solid var(--gold);
+    position: relative;
+    overflow: hidden;
+  }
+  .year-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--navy);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .year-card:active::after { opacity: 0.04; }
+  .year-card:active { transform: scale(0.985); }
+
+  .year-card-left { display: flex; flex-direction: column; gap: 2px; }
+  .year-card-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+  }
+  .year-card-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .year-card-total {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy-mid);
+    text-align: right;
+  }
+  .year-card-total span {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+    text-align: right;
+    margin-bottom: 2px;
+  }
+  .year-card-arrow {
+    color: var(--gold);
+    font-size: 18px;
+    margin-left: 10px;
+  }
+
+  .delete-year-btn {
+    background: none;
+    border: none;
+    color: #c0392b;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 1;
+  }
+  .delete-year-btn:active { background: rgba(192,57,43,0.1); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state svg { opacity: 0.25; margin-bottom: 14px; }
+  .empty-state p { font-size: 14px; line-height: 1.6; }
+
+  /* ─── SCREEN 2: MESES ─── */
+  .months-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .month-row {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--cream-dark);
+    transition: background 0.12s;
+    min-height: 58px;
+  }
+  .month-row:last-child { border-bottom: none; }
+  .month-row:focus-within { background: #fdfaf4; }
+
+  .month-num {
+    width: 22px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    flex-shrink: 0;
+    text-align: right;
+    margin-right: 12px;
+  }
+  .month-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    width: 82px;
+    flex-shrink: 0;
+  }
+  .month-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .month-input {
+    width: 120px;
+    border: 1.5px solid var(--cream-dark);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: right;
+    color: var(--text);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.18s, background 0.18s;
+    -moz-appearance: textfield;
+  }
+  .month-input::-webkit-inner-spin-button,
+  .month-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .month-input:focus {
+    border-color: var(--gold);
+    background: #fffdf6;
+  }
+  .month-input.has-value { color: var(--navy-dark); }
+  .euro-sym {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* ─── SUMMARY CARD ─── */
+  .summary-card {
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 60%, var(--navy-mid) 100%);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(200,168,75,0.12);
+    pointer-events: none;
+  }
+
+  .summary-item { position: relative; z-index: 1; }
+  .summary-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    opacity: 0.8;
+    margin-bottom: 4px;
+  }
+  .summary-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    word-break: break-all;
+  }
+  .summary-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+  }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--navy-dark);
+    color: var(--white);
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 999;
+    border: 1px solid var(--gold);
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,36,56,0.65);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 500;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    padding: 28px 22px 36px;
+    width: 100%;
+    max-width: 480px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .modal-overlay.active .modal-box { transform: translateY(0); }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .modal-msg {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .modal-btn:active { opacity: 0.8; }
+  .modal-btn-cancel { background: var(--cream-dark); color: var(--text); }
+  .modal-btn-confirm { background: #c0392b; color: var(--white); }
+
+  /* Scrollbar */
+  .screen-scroll::-webkit-scrollbar { width: 3px; }
+  .screen-scroll::-webkit-scrollbar-track { background: transparent; }
+  .screen-scroll::-webkit-scrollbar-thumb { background: var(--cream-dark); border-radius: 2px; }
+
+  .fade-in { animation: fadeIn 0.3s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-inner">
+      <button class="back-btn" id="backBtn" style="display:none" onclick="goBack()" aria-label="Volver">&#8592;</button>
+      <div class="header-titles">
+        <div class="header-eyebrow">Pensión de Jubilación</div>
+        <div class="header-title" id="headerTitle">Registro de Cobros</div>
+      </div>
+      <div class="header-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" stroke="#c8a84b" stroke-width="2" fill="none" opacity="0.4"/>
+          <text x="24" y="31" text-anchor="middle" font-size="20" fill="#c8a84b" font-family="serif" font-weight="bold">€</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 1: AÑOS -->
+  <div class="screen" id="screen1">
+    <div class="screen-scroll">
+      <div class="years-intro">
+        <p>Selecciona un año para ver o editar sus cobros,<br>o añade un nuevo año de registro.</p>
+      </div>
+
+      <div class="add-year-box">
+        <input type="number" id="newYearInput" placeholder="Ej: 2025" min="1900" max="2100" inputmode="numeric">
+        <button class="btn-add-year" onclick="addYear()">
+          <span style="font-size:20px;line-height:1">+</span> Añadir
+        </button>
+      </div>
+
+      <div class="section-label" id="listLabel" style="display:none">Años registrados</div>
+      <div class="years-list" id="yearsList"></div>
+
+      <div class="empty-state" id="emptyState">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <rect x="8" y="12" width="48" height="40" rx="6" stroke="#1a3a5c" stroke-width="2.5"/>
+          <path d="M8 22h48" stroke="#1a3a5c" stroke-width="2.5"/>
+          <path d="M20 32h24M20 40h16" stroke="#c8a84b" stroke-width="2" stroke-linecap="round"/>
+          <rect x="22" y="6" width="4" height="10" rx="2" fill="#1a3a5c"/>
+          <rect x="38" y="6" width="4" height="10" rx="2" fill="#1a3a5c"/>
+        </svg>
+        <p>Aún no hay años registrados.<br>Añade el primer año usando el campo de arriba.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: MESES -->
+  <div class="screen" id="screen2" style="display:none">
+    <div class="screen-scroll">
+      <div class="months-list" id="monthsList"></div>
+      <div class="summary-card">
+        <div class="summary-item">
+          <div class="summary-label">Media mensual</div>
+          <div class="summary-value" id="summaryMedia">—</div>
+          <div class="summary-sub" id="summaryMediaSub"></div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Total anual</div>
+          <div class="summary-value" id="summaryTotal">—</div>
+          <div class="summary-sub" id="summaryTotalSub"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-title">Eliminar año</div>
+    <div class="modal-msg" id="modalMsg"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn modal-btn-confirm" onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────
+const STORAGE_KEY = 'pension_cobros_v1';
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+let data = {}; // { "2025": [null, 1250.50, ...12 items] }
+let currentYear = null;
+let pendingDeleteYear = null;
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) data = JSON.parse(raw);
+  } catch(e) { data = {}; }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// ── FORMAT ────────────────────────────────────────────────
+function fmtEuro(val) {
+  if (val === null || val === undefined || val === '') return '—';
+  return val.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+// ── SCREEN 1: AÑOS ────────────────────────────────────────
+function renderYears() {
+  const list = document.getElementById('yearsList');
+  const empty = document.getElementById('emptyState');
+  const listLabel = document.getElementById('listLabel');
+  list.innerHTML = '';
+
+  const years = Object.keys(data).map(Number).sort((a,b) => b - a);
+
+  if (years.length === 0) {
+    empty.style.display = 'block';
+    listLabel.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  listLabel.style.display = 'block';
+
+  years.forEach(y => {
+    const months = data[String(y)];
+    const filled = months.filter(v => v !== null && v !== '');
+    const total = filled.reduce((s, v) => s + parseFloat(v), 0);
+    const totalStr = filled.length ? fmtEuro(total) : 'Sin datos';
+    const subStr = filled.length ? `${filled.length} mes${filled.length>1?'es':''} registrado${filled.length>1?'s':''}` : '0 meses registrados';
+
+    const card = document.createElement('div');
+    card.className = 'year-card fade-in';
+    card.innerHTML = `
+      <div class="year-card-left">
+        <div class="year-card-num">${y}</div>
+        <div class="year-card-sub">${subStr}</div>
+      </div>
+      <div class="year-card-total"><span>Total</span>${totalStr}</div>
+      <span class="year-card-arrow">›</span>
+      <button class="delete-year-btn" onclick="askDelete(event,'${y}')" aria-label="Eliminar año ${y}">&#128465;</button>
+    `;
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('.delete-year-btn')) openYear(y);
+    });
+    list.appendChild(card);
+  });
+}
+
+function addYear() {
+  const input = document.getElementById('newYearInput');
+  const y = parseInt(input.value);
+  if (!y || y < 1900 || y > 2100) { showToast('Introduce un año válido (1900–2100)'); return; }
+  if (data[String(y)]) { showToast(`El año ${y} ya existe`); return; }
+  data[String(y)] = Array(12).fill(null);
+  saveData();
+  input.value = '';
+  renderYears();
+  showToast(`Año ${y} añadido`);
+}
+
+function askDelete(e, year) {
+  e.stopPropagation();
+  pendingDeleteYear = year;
+  document.getElementById('modalMsg').textContent = `¿Eliminar el año ${year} y todos sus datos? Esta acción no se puede deshacer.`;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  pendingDeleteYear = null;
+}
+function confirmDelete() {
+  if (!pendingDeleteYear) return;
+  delete data[pendingDeleteYear];
+  saveData();
+  closeModal();
+  if (currentYear == pendingDeleteYear) goBack();
+  renderYears();
+  showToast('Año eliminado');
+}
+
+// click outside modal
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── SCREEN 2: MESES ───────────────────────────────────────
+function openYear(y) {
+  currentYear = y;
+  document.getElementById('screen1').style.display = 'none';
+  document.getElementById('screen2').style.display = 'flex';
+  document.getElementById('backBtn').style.display = 'flex';
+  document.getElementById('headerTitle').textContent = `Cobros ${y}`;
+  renderMonths();
+}
+
+function goBack() {
+  currentYear = null;
+  document.getElementById('screen2').style.display = 'none';
+  document.getElementById('screen1').style.display = 'flex';
+  document.getElementById('backBtn').style.display = 'none';
+  document.getElementById('headerTitle').textContent = 'Registro de Cobros';
+  renderYears();
+}
+
+function renderMonths() {
+  const container = document.getElementById('monthsList');
+  container.innerHTML = '';
+  const months = data[String(currentYear)];
+
+  MESES.forEach((name, i) => {
+    const val = months[i];
+    const row = document.createElement('div');
+    row.className = 'month-row';
+    row.innerHTML = `
+      <div class="month-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="month-name">${name}</div>
+      <div class="month-input-wrap">
+        <input
+          class="month-input ${val !== null && val !== '' ? 'has-value' : ''}"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="0.01"
+          placeholder="0,00"
+          value="${val !== null && val !== '' ? val : ''}"
+          data-month="${i}"
+          aria-label="${name}"
+        >
+        <span class="euro-sym">€</span>
+      </div>
+    `;
+    const input = row.querySelector('input');
+    input.addEventListener('input', onMonthInput);
+    input.addEventListener('blur', onMonthBlur);
+    container.appendChild(row);
+  });
+
+  updateSummary();
+}
+
+function onMonthInput(e) {
+  const i = parseInt(e.target.dataset.month);
+  const raw = e.target.value.trim();
+  const val = raw === '' ? null : parseFloat(raw);
+  data[String(currentYear)][i] = isNaN(val) ? null : val;
+  e.target.classList.toggle('has-value', val !== null && !isNaN(val));
+  saveData();
+  updateSummary();
+}
+
+function onMonthBlur(e) {
+  const i = parseInt(e.target.dataset.month);
+  const raw = e.target.value.trim();
+  if (raw !== '') {
+    const val = parseFloat(raw);
+    if (!isNaN(val)) {
+      e.target.value = val.toFixed(2);
+      data[String(currentYear)][i] = val;
+      saveData();
+    }
+  }
+}
+
+function updateSummary() {
+  const months = data[String(currentYear)];
+  const filled = months.filter(v => v !== null && v !== '' && !isNaN(parseFloat(v))).map(v => parseFloat(v));
+
+  const mediaEl = document.getElementById('summaryMedia');
+  const totalEl = document.getElementById('summaryTotal');
+  const mediaSubEl = document.getElementById('summaryMediaSub');
+  const totalSubEl = document.getElementById('summaryTotalSub');
+
+  if (filled.length === 0) {
+    mediaEl.textContent = '—';
+    totalEl.textContent = '—';
+    mediaSubEl.textContent = '';
+    totalSubEl.textContent = '';
+    return;
+  }
+
+  const total = filled.reduce((s, v) => s + v, 0);
+  const media = total / filled.length;
+
+  mediaEl.textContent = fmtEuro(media);
+  totalEl.textContent = fmtEuro(total);
+  mediaSubEl.textContent = `sobre ${filled.length} mes${filled.length>1?'es':''}`;
+  totalSubEl.textContent = `${filled.length} de 12 meses`;
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── ENTER key on year input ───────────────────────────────
+document.getElementById('newYearInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addYear();
+});
+
+// ── INIT ─────────────────────────────────────────────────
+loadData();
+renderYears();
+</script>
+</body>
+</html>
